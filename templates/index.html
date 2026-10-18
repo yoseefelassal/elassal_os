@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050907">
+<title>ELASSAL OS</title>
+<style>
+:root {
+  --bg:#050907; --panel:rgba(12,24,17,.91);
+  --green:#39ff88; --muted:#8aa796;
+  --border:rgba(57,255,136,.22);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:#eafff0;
+  font-family:system-ui,"Segoe UI",sans-serif;
+  min-height:100vh;overflow-x:hidden
+}
+#matrix{position:fixed;inset:0;width:100%;height:100%;
+  opacity:.20;z-index:-1}
+button,input{font:inherit}
+button{cursor:pointer}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}
+aside{
+  background:rgba(4,12,8,.94);border-left:1px solid var(--border);
+  padding:22px 14px;position:sticky;top:0;height:100vh
+}
+.brand{font-weight:900;color:var(--green);font-size:23px;
+  text-align:center;letter-spacing:1px}
+.wolf{width:80px;height:80px;border:1px solid var(--green);
+  border-radius:50%;display:grid;place-items:center;margin:18px auto;
+  color:var(--green);font-size:43px;
+  box-shadow:0 0 25px #39ff8840;animation:pulse 3s infinite}
+@keyframes pulse{50%{box-shadow:0 0 38px #39ff8870}}
+nav{display:grid;gap:8px;margin-top:25px}
+nav button,.soft{
+  background:transparent;color:#d8f5e3;border:1px solid transparent;
+  padding:12px;text-align:right;border-radius:10px
+}
+nav button:hover,nav button.active,.soft:hover{
+  background:#12301e;border-color:var(--border);color:var(--green)
+}
+main{min-width:0;padding:20px}
+header{display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);
+  padding-bottom:16px}
+header h1{font-size:19px;margin:0}
+.green{color:var(--green)}
+.search{background:#0b1710;border:1px solid var(--border);
+  border-radius:10px;color:white;padding:11px;min-width:0;width:260px}
+.profile{display:flex;align-items:center;gap:10px}
+.avatar{width:39px;height:39px;border:1px solid var(--green);
+  border-radius:50%;display:grid;place-items:center;overflow:hidden;
+  background:#10251a;color:var(--green);font-size:22px}
+.avatar img{width:100%;height:100%;object-fit:cover}
+section{margin-top:22px}
+.hero{padding:24px;border:1px solid var(--border);border-radius:17px;
+  background:linear-gradient(125deg,#10251aeb,#07100bee)}
+.eyebrow{color:var(--green);font-size:12px;letter-spacing:2px}
+h2{margin:9px 0;font-size:clamp(22px,4vw,34px)}
+p{color:#a9c4b3;line-height:1.8}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.card{background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:17px;min-width:0}
+.card h3{margin:8px 0;font-size:16px}
+.symbol{font-size:24px;color:var(--green)}
+.value{font-size:23px;color:var(--green);font-weight:800}
+.page{display:none}.page.active{display:block}
+.tool{cursor:pointer;transition:.2s}
+.tool:hover{transform:translateY(-3px);border-color:var(--green)}
+.action{background:var(--green);color:#041109;border:0;
+  border-radius:9px;padding:10px 15px;font-weight:800}
+.output{background:#020503;border:1px solid #183b27;border-radius:10px;
+  padding:14px;min-height:150px;white-space:pre-wrap;overflow-wrap:anywhere;
+  color:#80ffae;font:13px/1.8 monospace}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+input[type=file]{max-width:100%;color:var(--muted)}
+.small{font-size:12px;color:var(--muted)}
+.notice{padding:12px;border-bottom:1px solid var(--border)}
+footer{text-align:center;color:#668574;padding:30px 0;font-size:12px}
+@media(max-width:760px){
+ .layout{grid-template-columns:1fr}
+ aside{height:auto;position:relative;padding:12px;border-left:0;
+   border-bottom:1px solid var(--border)}
+ .wolf{width:52px;height:52px;font-size:28px;margin:10px auto}
+ .brand{font-size:19px}
+ nav{display:flex;overflow-x:auto;margin-top:10px}
+ nav button{white-space:nowrap;padding:9px}
+ main{padding:14px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .search{width:100%}
+ header{align-items:stretch}
+}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.hero{padding:17px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{
+ animation:none!important;transition:none!important}}
+
+/* ELASSAL_MATRIX_INTRO_V1 */
+#elassalIntro{position:fixed;inset:0;z-index:999999;background:#020805;
+display:grid;place-items:center;overflow:hidden;opacity:1;visibility:visible;
+transition:opacity .65s ease,visibility .65s ease}
+#elassalIntro.intro-out{opacity:0;visibility:hidden;pointer-events:none}
+#elassalIntro .intro-rain{position:absolute;inset:0;overflow:hidden;color:#39ff88;
+font:16px/1.65 monospace;text-shadow:0 0 9px #39ff88;opacity:.6}
+#elassalIntro .intro-rain span{position:absolute;top:-120%;white-space:pre;
+animation:elassalIntroFall 2.3s linear infinite}
+#elassalIntro .intro-rain span:nth-child(1){left:8%;animation-delay:-.4s}
+#elassalIntro .intro-rain span:nth-child(2){left:28%;animation-delay:-1.5s}
+#elassalIntro .intro-rain span:nth-child(3){left:49%;animation-delay:-.8s}
+#elassalIntro .intro-rain span:nth-child(4){left:70%;animation-delay:-1.9s}
+#elassalIntro .intro-rain span:nth-child(5){left:91%;animation-delay:-1.1s}
+@keyframes elassalIntroFall{from{transform:translateY(-10%)}to{transform:translateY(230%)}}
+#elassalIntro .intro-center{position:absolute;inset:0;
+z-index:2;display:flex;align-items:center;justify-content:center;
+width:100%;height:100%;padding:12px;margin:0}
+#elassalIntro .intro-image{
+display:block;
+width:auto;height:auto;
+max-width:96vw;max-height:92vh;
+object-fit:contain;opacity:1;filter:none;
+position:relative;z-index:10;margin:auto;
+}
+#elassalIntro .intro-wolf{font-size:clamp(64px,15vw,110px);line-height:1.2;
+filter:drop-shadow(0 0 18px #39ff88);animation:elassalWolfPulse 1.4s ease-in-out infinite alternate}
+#elassalIntro .intro-title{font-size:clamp(25px,6vw,42px);font-weight:900;
+letter-spacing:4px;margin-top:12px}
+#elassalIntro .intro-sub{font-size:12px;letter-spacing:3px;margin-top:10px;color:#b4ffd0}
+@keyframes elassalWolfPulse{from{transform:scale(.96);opacity:.8}to{transform:scale(1.04);opacity:1}}
+@media(prefers-reduced-motion:reduce){
+#elassalIntro .intro-rain span,#elassalIntro .intro-wolf{animation:none}
+#elassalIntro{transition:none}
+}
+
+</style>
+</head>
+<body>
+
+<div id="elassalIntro" aria-label="ELASSAL OS intro">
+  <div class="intro-rain" aria-hidden="true">
+    <span>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>0</span>
+    <span>1<br>0<br>1<br>1<br>0<br>0<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>0<br>1<br>1<br>0<br>1<br>0</span>
+    <span>1<br>1<br>0<br>1<br>0<br>1<br>0<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>0<br>0<br>1<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>0<br>1<br>1</span>
+    <span>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>0<br>1<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>0<br>1<br>1<br>0</span>
+    <span>1<br>0<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>1<br>0<br>1<br>1<br>0<br>0<br>1<br>0<br>1<br>1</span>
+  </div>
+  <div class="intro-center intro-image-wrap">
+    <img class="intro-image"
+         src="{{ url_for('static', filename='elassal_intro.png') }}"
+         alt="ELASSAL OS intro">
+  </div>
+</div>
+
+<canvas id="matrix" aria-hidden="true"></canvas>
+<div class="layout">
+<aside>
+  <div class="brand">ELASSAL OS</div>
+  <div class="wolf" title="Cyber Wolf">🐺</div>
+  <div class="small" style="text-align:center">CYBER CONTROL CENTER</div>
+  <nav id="nav">
+    <button class="active" data-page="home">⌂ غرفة التحكم</button>
+    <button data-page="tools">▦ مركز الأدوات</button>
+    <button data-page="terminal">⌘ Terminal تعليمي</button>
+    <button data-page="lab">⌁ معمل البرمجة</button>
+    <button data-page="network">◎ الشبكات</button>
+    <button data-page="profile">◉ ملفي الشخصي</button>
+    <button data-page="notifications">♧ الإشعارات</button>
+  </nav>
+</aside>
+<main>
+<header>
+  <div>
+    <div class="eyebrow">SYSTEM ONLINE · LOCAL PREVIEW</div>
+    <h1>غرفة تحكم <span class="green">العسّال</span></h1>
+  </div>
+  <input id="search" class="search" placeholder="ابحث عن قسم أو أداة..." aria-label="بحث">
+  <div class="profile">
+    <div class="avatar" id="smallAvatar">🐺</div>
+    <div><strong id="headerName">ELASSAL</strong><div class="small">Administrator preview</div></div>
+  </div>
+</header>
+
+<!-- ELASSAL_AUTH_SHORTCUTS_V1 -->
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0">
+  <a href="/auth/login" style="color:#39ff88;border:1px solid #28553d;padding:9px 13px;border-radius:10px;text-decoration:none">تسجيل الدخول</a>
+  <a href="/auth/register" style="color:#39ff88;border:1px solid #28553d;padding:9px 13px;border-radius:10px;text-decoration:none">إنشاء حساب</a>
+</div>
+
+
+<section class="page active" id="home">
+ <div class="hero">
+   <div class="eyebrow">WELCOME BACK, OPERATOR</div>
+   <h2>أهلاً بيك في <span class="green">ELASSAL OS</span></h2>
+   <p>مساحتك للبرمجة والشبكات والتعلّم الأمني. ابدأ من هنا، واكتشف أدواتك من واجهة واحدة.</p>
+   <div class="row"><button class="action" data-go="tools">استكشف الأدوات ←</button>
+   <button class="soft" data-go="terminal">افتح Terminal التعليمي</button></div>
+ </div>
+ <section class="grid">
+  <div class="card"><div class="symbol">◉</div><h3>حالة النظام</h3><div class="value">ONLINE</div><div class="small">الواجهة المحلية تعمل</div></div>
+  <div class="card"><div class="symbol">⌘</div><h3>الأدوات</h3><div class="value">06</div><div class="small">أقسام تجريبية</div></div>
+  <div class="card"><div class="symbol">◷</div><h3>الوقت</h3><div class="value" id="clock">--:--</div><div class="small" id="date"></div></div>
+ </section>
+ <section class="grid">
+  <div class="card tool" data-go="terminal"><div class="symbol">⌘</div><h3>Terminal تعليمي</h3><p>جرّب أوامر توضيحية آمنة.</p></div>
+  <div class="card tool" data-go="lab"><div class="symbol">{ }</div><h3>معمل البرمجة</h3><p>مساحة للتعلّم وتجربة أمثلة بسيطة.</p></div>
+  <div class="card tool" data-go="network"><div class="symbol">◎</div><h3>مختبر الشبكات</h3><p>مفاهيم الشبكات والتدريب الدفاعي.</p></div>
+ </section>
+</section>
+
+<section class="page" id="tools">
+ <div class="hero"><div class="eyebrow">TOOLKIT</div><h2>مركز الأدوات</h2><p>اختار القسم اللي عايز تتعلمه.</p></div>
+ <section class="grid" id="toolGrid">
+  <div class="card tool" data-go="terminal" data-search="terminal أوامر سطر الأوامر"><div class="symbol">⌘</div><h3>Terminal تعليمي</h3><p>أوامر توضيحية داخل المتصفح.</p></div>
+  <div class="card tool" data-go="lab" data-search="برمجة كود programming"><div class="symbol">{ }</div><h3>معمل البرمجة</h3><p>تعلّم أساسيات كتابة الكود.</p></div>
+  <div class="card tool" data-go="network" data-search="شبكات network دفاع"><div class="symbol">◎</div><h3>مختبر الشبكات</h3><p>مفاهيم الشبكات والدفاع الرقمي.</p></div>
+  <div class="card tool" data-go="profile" data-search="صورة حساب ملف شخصي"><div class="symbol">◉</div><h3>الملف الشخصي</h3><p>تعديل الاسم والصورة المحلية.</p></div>
+  <div class="card tool" data-go="notifications" data-search="تنبيهات إشعارات"><div class="symbol">♧</div><h3>الإشعارات</h3><p>عرض التنبيهات التجريبية.</p></div>
+  <div class="card tool" data-go="home" data-search="الرئيسية لوحة تحكم"><div class="symbol">⌂</div><h3>غرفة التحكم</h3><p>العودة إلى الصفحة الرئيسية.</p></div>
+ </section>
+ <p id="noResults" hidden>مفيش نتائج مطابقة.</p>
+</section>
+
+<section class="page" id="terminal">
+ <div class="hero"><div class="eyebrow">LEARNING SANDBOX · DEMO ONLY</div><h2>Terminal <span class="green">تعليمي</span></h2><p>ده محاكي تجريبي محدود، مش منفّذ أوامر حقيقية على السيرفر.</p></div>
+ <section class="card">
+  <div class="output" id="output">ELASSAL OS Learning Terminal
+اكتب help لعرض الأوامر التجريبية.
+$ </div>
+  <form id="termForm" class="row" style="margin-top:12px">
+   <input id="cmd" class="search" style="flex:1" placeholder="help أو date أو whoami" autocomplete="off">
+   <button class="action">تنفيذ تجريبي</button>
+  </form>
+ </section>
+</section>
+
+<section class="page" id="lab">
+ <div class="hero"><div class="eyebrow">PROGRAMMING LAB</div><h2>معمل البرمجة</h2><p>مساحة تجريبية لكتابة الملاحظات البرمجية محليًا في الصفحة.</p></div>
+ <section class="card">
+  <label for="codeArea">اكتب مثالًا أو ملاحظاتك:</label>
+  <textarea id="codeArea" class="search" style="width:100%;height:180px;margin-top:12px;direction:ltr" placeholder="// اكتب كودك هنا..."></textarea>
+  <p class="small">المحرر هنا لا يشغّل الكود. التشغيل الفعلي يحتاج بيئة تنفيذ آمنة منفصلة.</p>
+  <button class="action" id="saveNotes">عرض النص المكتوب</button>
+  <pre class="output" id="codeOutput" style="margin-top:12px"></pre>
+ </section>
+</section>
+
+<section class="page" id="network">
+ <div class="hero"><div class="eyebrow">DEFENSIVE NETWORKING</div><h2>مختبر الشبكات</h2><p>معلومات تعليمية تجريبية، وليست فحصًا فعليًا لاتصالات جهازك.</p></div>
+ <section class="grid">
+  <div class="card"><div class="symbol">◎</div><h3>مبادئ الشبكات</h3><p>تعرّف على IP وDNS وHTTP وHTTPS.</p></div>
+  <div class="card"><div class="symbol">♧</div><h3>الأمان الدفاعي</h3><p>تعلّم كلمات المرور القوية والتحديثات ومبدأ أقل صلاحية.</p></div>
+  <div class="card"><div class="symbol">▤</div><h3>سجل التدريب</h3><p>ابدأ بكتابة ملاحظاتك في معمل البرمجة.</p></div>
+ </section>
+</section>
+
+<section class="page" id="profile">
+ <div class="hero"><div class="eyebrow">YOUR PROFILE</div><h2>ملفي الشخصي</h2><p>تم حفظ الاسم والصورة محليًا على هذا المتصفح. ربطهما بحسابك على السيرفر لم يُفعّل بعد.</p></div>
+ <section class="card">
+  <div class="row">
+   <div class="avatar" id="bigAvatar" style="width:76px;height:76px;font-size:35px">🐺</div>
+   <div><strong id="profileTitle">ELASSAL</strong><div class="small">صورة مؤقتة — تقدر تختار صورة من موبايلك</div></div>
+  </div>
+  <p><label for="nameInput">اسم العرض</label></p>
+  <input id="nameInput" class="search" value="ELASSAL">
+  <p><label for="photoInput">اختيار صورتك</label></p>
+  <input type="file" id="photoInput" accept="image/*">
+  <p><button class="action" id="updateProfile">تحديث المعاينة</button></p>
+ </section>
+</section>
+
+<section class="page" id="notifications">
+ <div class="hero"><div class="eyebrow">SMART NOTIFICATIONS</div><h2>مركز الإشعارات</h2><p>إشعارات توضيحية للنسخة التجريبية.</p></div>
+ <section class="card">
+  <div class="notice">🟢 أهلاً بيك في ELASSAL OS.</div>
+  <div class="notice">🔐 تذكير: فعّل التحقق الإضافي عند بناء نظام الحسابات.</div>
+  <div class="notice">🏆 نظام XP والإنجازات مخطط لإضافته في مرحلة لاحقة.</div>
+ </section>
+</section>
+<footer>ELASSAL OS · LOCAL PROTOTYPE · BUILD YOUR SKILLS RESPONSIBLY</footer>
+</main>
+</div>
+
+<script>
+const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
+let cols=[],font=15;
+function resize(){
+ canvas.width=innerWidth;canvas.height=innerHeight;
+ cols=Array(Math.ceil(canvas.width/font)).fill(0);
+}
+resize();addEventListener('resize',resize);
+let last=0;
+function rain(t){
+ if(t-last>65){
+  last=t;ctx.fillStyle='rgba(5,9,7,.12)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#39ff88';ctx.font=font+'px monospace';
+  cols.forEach((y,i)=>{
+   ctx.fillText(Math.random()>.5?'1':'0',i*font,y*font);
+   if(y*font>canvas.height&&Math.random()>.975)cols[i]=0;
+   else cols[i]++;
+  });
+ }
+ requestAnimationFrame(rain);
+}
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(rain);
+
+function showPage(name){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===name));
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+ document.getElementById('search').value='';
+ document.querySelectorAll('#toolGrid .tool').forEach(el=>el.hidden=false);
+ document.getElementById('noResults').hidden=true;
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.go)));
+
+document.getElementById('search').addEventListener('input',e=>{
+ const q=e.target.value.trim().toLowerCase();
+ if(!q)return;
+ showPage('tools');
+ document.getElementById('search').value=q;
+ let count=0;
+ document.querySelectorAll('#toolGrid .tool').forEach(el=>{
+  const match=(el.innerText+' '+(el.dataset.search||'')).toLowerCase().includes(q);
+  el.hidden=!match;if(match)count++;
+ });
+ document.getElementById('noResults').hidden=count!==0;
+ document.getElementById('search').value=q;
+});
+
+function tick(){
+ const d=new Date();
+ document.getElementById('clock').textContent=d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+ document.getElementById('date').textContent=d.toLocaleDateString('ar-EG');
+}
+tick();setInterval(tick,60000);
+
+document.getElementById('termForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const input=document.getElementById('cmd'),cmd=input.value.trim();
+ if(!cmd)return;
+ const out=document.getElementById('output');
+ const replies={
+  help:'الأوامر التجريبية المتاحة: help, date, whoami, clear, about',
+  whoami:'demo-user (محاكاة تعليمية فقط)',
+  about:'ELASSAL OS Learning Terminal — لا ينفذ أوامر نظام حقيقية.',
+  date:new Date().toString()
+ };
+ if(cmd==='clear'){out.textContent='ELASSAL OS Learning Terminal\\n$ ';input.value='';return;}
+ out.textContent+='$ '+cmd+'\\n'+(replies[cmd]||'الأمر غير موجود في المحاكي. اكتب help لعرض الأوامر.')+'\\n';
+ input.value='';out.scrollTop=out.scrollHeight;
+});
+document.getElementById('saveNotes').addEventListener('click',()=>{
+ document.getElementById('codeOutput').textContent=document.getElementById('codeArea').value||'لم تكتب أي نص بعد.';
+});
+let photoUrl=null;
+document.getElementById('updateProfile').addEventListener('click',()=>{
+ const name=document.getElementById('nameInput').value.trim()||'ELASSAL';
+ document.getElementById('headerName').textContent=name;
+ document.getElementById('profileTitle').textContent=name;
+ const file=document.getElementById('photoInput').files[0];
+ if(file){
+  if(!file.type.startsWith('image/'))return alert('اختار ملف صورة صالح.');
+  if(file.size>5*1024*1024)return alert('الصورة لازم تكون أقل من 5 ميجابايت.');
+  if(photoUrl)URL.revokeObjectURL(photoUrl);
+  photoUrl=URL.createObjectURL(file);
+  ['smallAvatar','bigAvatar'].forEach(id=>{
+   const el=document.getElementById(id);el.innerHTML='';
+   const img=document.createElement('img');img.src=photoUrl;img.alt='الصورة الشخصية';el.appendChild(img);
+  });
+ }
+ alert('تم تحديث المعاينة الحالية. الحفظ الدائم للحساب سيضاف لاحقًا.');
+});
+</script>
+
+<script>
+/* ELASSAL_PROFILE_PERSISTENCE_V2 */
+(() => {
+  const KEY = 'elassal_os_profile_v2';
+  const $ = id => document.getElementById(id);
+
+  function apply(data) {
+    if (data.name) {
+      if ($('nameInput')) $('nameInput').value = data.name;
+      if ($('headerName')) $('headerName').textContent = data.name;
+      if ($('profileTitle')) $('profileTitle').textContent = data.name;
+    }
+
+    if (data.photo) {
+      ['smallAvatar', 'bigAvatar'].forEach(id => {
+        const box = $(id);
+        if (!box) return;
+        const img = document.createElement('img');
+        img.src = data.photo;
+        img.alt = 'الصورة الشخصية';
+        box.replaceChildren(img);
+      });
+    }
+  }
+
+  function readSaved() {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || '{}');
+    } catch (_) {
+      return {};
+    }
+  }
+
+  // تحميل البيانات عند فتح الصفحة
+  apply(readSaved());
+
+  const button = $('updateProfile');
+  if (!button) return;
+
+  // نضيف مستمعًا واحدًا للحفظ دون حذف معاينة الموقع الأصلية
+  button.addEventListener('click', () => {
+    const name = ($('nameInput')?.value || '').trim() || 'ELASSAL';
+    const file = $('photoInput')?.files?.[0];
+    const previous = readSaved();
+
+    function persist(photo) {
+      const data = { name, photo: photo || previous.photo || '' };
+      try {
+        localStorage.setItem(KEY, JSON.stringify(data));
+        apply(data);
+        alert('تم حفظ الاسم والصورة على هذا المتصفح.');
+      } catch (_) {
+        alert('تعذر الحفظ. جرّب صورة أصغر أو حرّر مساحة في المتصفح.');
+      }
+    }
+
+    if (!file) {
+      persist('');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('اختار ملف صورة صالح.');
+      return;
+    }
+
+    if (file.size > 1024 * 1024) {
+      alert('للحفظ المحلي اختار صورة أقل من 1 ميجابايت.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => persist(reader.result);
+    reader.onerror = () => alert('تعذرت قراءة الصورة.');
+    reader.readAsDataURL(file);
+  });
+})();
+</script>
+
+
+<script>
+/* ELASSAL_MATRIX_INTRO_V1 */
+(function(){
+  var intro=document.getElementById('elassalIntro');
+  if(!intro)return;
+  window.setTimeout(function(){
+    intro.classList.add('intro-out');
+    window.setTimeout(function(){if(intro.parentNode)intro.parentNode.removeChild(intro);},750);
+  },7000);
+})();
+</script>
+
+<script src="{{ url_for('static', filename='network_lab_ui.js') }}?v=20261018" defer></script>
+</body>
+</html>

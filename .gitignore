@@ -1,0 +1,14 @@
+instance/
+__pycache__/
+*.pyc
+*.sqlite
+*.sqlite3
+*.db
+.env
+*.bak
+*.bak_*
+index_before_*.html
+templates/*.bak*
+templates/index_backup_*.html
+templates/index_before_*.html
+templates/index_safe_*.html
